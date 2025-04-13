@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Download, Printer, Share2, BookmarkPlus, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Download, Printer, Share2, BookmarkPlus,BookOpen, ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
+import { useState } from "react";
 
 const SmartNotes = () => {
   const navigate = useNavigate();
+  const [materialTitle, setMaterialTitle] = useState("Neural Networks");
+
   // Mock data for smart notes
   const notes = {
     title: "Introduction to Neural Networks",
@@ -54,9 +58,10 @@ const SmartNotes = () => {
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-3 hidden sm:block">
-            Source: <span className="text-primary">{notes.source}</span>
-          </p>
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+            {materialTitle}
+          </Badge>
           <Button variant="outline" size="sm" onClick={handleUploadNew}>
             <Upload className="h-4 w-4 mr-2" />
             New Material
@@ -89,14 +94,14 @@ const SmartNotes = () => {
           <TabsTrigger value="key-points">Key Points</TabsTrigger>
           <TabsTrigger value="summary">Summary</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="notes">
           <Card>
             <CardContent className="p-6 space-y-6">
               <div className="prose max-w-none">
                 <p className="text-lg font-medium">{notes.summary}</p>
                 <Separator className="my-4" />
-                
+
                 {notes.sections.map((section, index) => (
                   <div key={index} className="mb-8">
                     <h3 className="text-xl font-semibold mb-2">{section.title}</h3>
@@ -107,7 +112,7 @@ const SmartNotes = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="key-points">
           <Card>
             <CardContent className="p-6">
@@ -124,7 +129,7 @@ const SmartNotes = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="summary">
           <Card>
             <CardContent className="p-6">

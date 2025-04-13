@@ -8,7 +8,7 @@ import { Menu, X } from "lucide-react";
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -24,24 +24,24 @@ export function AppLayout() {
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
-      
+
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      
+
       {/* Sidebar */}
-      <Sidebar 
-        className={`${sidebarOpen ? 'block' : 'hidden'} md:block fixed z-40 md:relative w-64`} 
+      <Sidebar
+        className={`${sidebarOpen ? 'block' : 'hidden'} md:block fixed z-40 md:relative w-64`}
       />
-      
+
       {/* Main content - removed left margin for md screens and added it to the main element instead */}
       <div className="flex flex-col flex-1">
         <Header />
-        <main className="flex-1 p-6 pt-16 md:pt-6 md:ml-64">
+        <main className="flex-1 p-6 pt-16 md:pt-6 ">
           <Outlet />
         </main>
       </div>

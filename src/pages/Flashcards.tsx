@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Upload } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, ChevronLeft, ChevronRight, RotateCcw, Shuffle, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -13,7 +13,7 @@ const Flashcards = () => {
   const [knownCards, setKnownCards] = useState<number[]>([]);
   const [materialTitle, setMaterialTitle] = useState("Neural Networks");
   const navigate = useNavigate();
-  
+
   // Sample flashcards
   const flashcards = [
     {
@@ -90,9 +90,10 @@ const Flashcards = () => {
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-3 hidden sm:block">
-            Currently studying: <span className="text-primary">{materialTitle}</span>
-          </p>
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+            {materialTitle}
+          </Badge>
           <Button variant="outline" size="sm" onClick={handleUploadNew}>
             <Upload className="h-4 w-4 mr-2" />
             New Material
@@ -143,7 +144,7 @@ const Flashcards = () => {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
+
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -164,7 +165,7 @@ const Flashcards = () => {
             <span>Shuffle</span>
           </Button>
         </div>
-        
+
         <Button
           variant="outline"
           size="icon"
@@ -177,7 +178,7 @@ const Flashcards = () => {
       <Card>
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
-            <Button 
+            <Button
               variant="secondary"
               onClick={handleNext}
             >

@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 
 // Node interface for mindmap
@@ -20,7 +21,7 @@ const Mindmap = () => {
   const { toast } = useToast();
   const materialTitle = "Neural Networks";
   const materialSource = "Neural_Networks.pdf";
-  
+
   // Sample mindmap data
   const initialMindMap: MindMapNode = {
     id: "root",
@@ -151,14 +152,14 @@ const Mindmap = () => {
     if (nodes.id === nodeId) {
       return { ...nodes, expanded: !nodes.expanded };
     }
-    
+
     if (nodes.children) {
       return {
         ...nodes,
         children: nodes.children.map((child) => toggleNode(nodeId, child)),
       };
     }
-    
+
     return nodes;
   };
 
@@ -175,10 +176,10 @@ const Mindmap = () => {
   const renderMindmapNode = (node: MindMapNode, level: number = 0) => {
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = node.expanded !== false;
-    
+
     return (
       <div key={node.id} className="mindmap-node">
-        <div 
+        <div
           className={`flex items-center py-1 pl-${level * 4} cursor-pointer hover:bg-secondary rounded transition-colors`}
           onClick={() => handleNodeClick(node.id)}
         >
@@ -194,7 +195,7 @@ const Mindmap = () => {
           {!hasChildren && <div className="w-5 mr-1" />}
           <span>{node.label}</span>
         </div>
-        
+
         {isExpanded && hasChildren && (
           <div className="pl-4">
             {node.children.map((child) => renderMindmapNode(child, level + 1))}
@@ -203,16 +204,16 @@ const Mindmap = () => {
       </div>
     );
   };
-  
+
   // Recursive function to render nodes in flowchart style
   const renderFlowchartNode = (node: MindMapNode, level: number = 0) => {
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = node.expanded !== false;
-    
+
     // Determine node style based on level
     let nodeStyle = "";
     let connectStyle = "";
-    
+
     switch (level) {
       case 0:
         nodeStyle = "bg-primary text-primary-foreground";
@@ -229,18 +230,18 @@ const Mindmap = () => {
       default:
         nodeStyle = "bg-yellow-500 text-white";
     }
-    
+
     return (
       <div key={node.id} className="relative">
         <div className="flex mb-4">
-          <div 
+          <div
             className={`px-4 py-2 rounded-md ${nodeStyle} cursor-pointer`}
             onClick={() => handleNodeClick(node.id)}
           >
             {node.label}
           </div>
         </div>
-        
+
         {isExpanded && hasChildren && (
           <div className="ml-8 pl-4 border-l-2 border-dashed">
             {node.children.map((child) => (
@@ -265,16 +266,17 @@ const Mindmap = () => {
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-3 hidden sm:block">
-            Currently studying: <span className="text-primary">{materialTitle}</span>
-          </p>
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+            {materialTitle}
+          </Badge>
           <Button variant="outline" size="sm" onClick={handleUploadNew}>
             <Upload className="h-4 w-4 mr-2" />
             New Material
           </Button>
         </div>
       </div>
-      
+
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-64 flex flex-col gap-4">
           <Card>
@@ -300,7 +302,7 @@ const Mindmap = () => {
                   Flowchart
                 </Button>
               </div>
-            
+
               <div className="flex items-center">
                 <Button
                   variant="outline"
@@ -320,14 +322,14 @@ const Mindmap = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <Button variant="outline" size="sm" className="w-full">
                 <DownloadCloud className="h-4 w-4 mr-2" />
                 Export
               </Button>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="py-4 px-4">
               <CardTitle className="text-lg">Legend</CardTitle>
@@ -354,7 +356,7 @@ const Mindmap = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <div className="flex-1">
           <Card className="h-[calc(100vh-200px)] overflow-auto">
             <CardHeader className="py-4 px-6 border-b">
@@ -366,7 +368,7 @@ const Mindmap = () => {
                 className="mindmap-container"
                 style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }}
               >
-                {viewMode === 'mindmap' 
+                {viewMode === 'mindmap'
                   ? renderMindmapNode(mindMap)
                   : renderFlowchartNode(mindMap)
                 }

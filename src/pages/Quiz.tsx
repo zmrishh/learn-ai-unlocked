@@ -6,9 +6,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, CornerDownRight, ArrowRight, ChevronRight, Trophy, EyeIcon, PencilIcon, Upload } from "lucide-react";
+import { BookOpen, ChevronDown, CheckCircle2, Plus, Minus, DownloadCloud, XCircle, CornerDownRight, ArrowRight, ChevronRight, Trophy, EyeIcon, PencilIcon, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 type QuizMode = "preview" | "quiz" | "feedback";
@@ -135,7 +136,7 @@ const Quiz = () => {
       newResponses[currentQuestion] = shortAnswerResponse;
       setShortAnswerResponses(newResponses);
     }
-    
+
     if (currentQuestion < (quizType === "mcq" ? mcqQuestions.length - 1 : shortAnswerQuestions.length - 1)) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -173,7 +174,7 @@ const Quiz = () => {
     navigate("/upload");
   };
 
-  const progressPercentage = quizType === "mcq" 
+  const progressPercentage = quizType === "mcq"
     ? ((currentQuestion + 1) / mcqQuestions.length) * 100
     : ((currentQuestion + 1) / shortAnswerQuestions.length) * 100;
 
@@ -223,7 +224,7 @@ const Quiz = () => {
         </Card>
       );
     }
-    
+
     if (quizMode === "quiz") {
       return (
         <Card>
@@ -235,7 +236,7 @@ const Quiz = () => {
             </div>
             <Progress value={progressPercentage} className="h-2" />
             <CardTitle className="text-xl mt-4">
-              {quizType === "mcq" 
+              {quizType === "mcq"
                 ? mcqQuestions[currentQuestion].question
                 : shortAnswerQuestions[currentQuestion].question
               }
@@ -268,7 +269,7 @@ const Quiz = () => {
           </CardContent>
           <CardFooter className="flex justify-between">
             {quizType === "mcq" ? (
-              <Button 
+              <Button
                 onClick={handleNextQuestion}
                 disabled={!selectedAnswer}
                 className="ml-auto"
@@ -286,7 +287,7 @@ const Quiz = () => {
                 )}
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={handleNextQuestion}
                 disabled={!shortAnswerResponse.trim()}
                 className="ml-auto"
@@ -308,11 +309,11 @@ const Quiz = () => {
         </Card>
       );
     }
-    
+
     if (quizMode === "feedback") {
       if (quizType === "mcq") {
         const topicStrengths = getTopicStrengthAssessment();
-        
+
         return (
           <Card>
             <CardHeader>
@@ -337,7 +338,7 @@ const Quiz = () => {
                     : "Keep practicing to improve your score."}
                 </p>
               </div>
-              
+
               <div className="mb-6 p-4 border rounded-md bg-secondary/20">
                 <h3 className="font-semibold text-lg mb-3">Topic Strength Assessment</h3>
                 <div className="space-y-4">
@@ -346,8 +347,8 @@ const Quiz = () => {
                       <div className="flex justify-between items-center">
                         <span className="font-medium">{topic.topic}</span>
                         <span className={`text-sm px-2 py-0.5 rounded-full ${
-                          topic.strength === 'strong' 
-                            ? 'bg-green-100 text-green-800' 
+                          topic.strength === 'strong'
+                            ? 'bg-green-100 text-green-800'
                             : topic.strength === 'moderate'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
@@ -355,15 +356,15 @@ const Quiz = () => {
                           {topic.strength.charAt(0).toUpperCase() + topic.strength.slice(1)}
                         </span>
                       </div>
-                      <Progress 
+                      <Progress
                         value={
-                          topic.strength === 'strong' 
-                            ? 90 
+                          topic.strength === 'strong'
+                            ? 90
                             : topic.strength === 'moderate'
                             ? 50
                             : 20
-                        } 
-                        className="h-2" 
+                        }
+                        className="h-2"
                       />
                       <p className="text-sm text-muted-foreground">
                         <span className="font-medium">Recommendation:</span> {topic.recommendations}
@@ -372,14 +373,14 @@ const Quiz = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="space-y-6">
                 {mcqQuestions.map((q, index) => {
                   const isCorrect = userAnswers[index] === q.correctAnswer;
-                  
+
                   return (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={`p-4 border rounded-md ${isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
                     >
                       <div className="flex items-start gap-2 mb-2">
@@ -391,18 +392,18 @@ const Quiz = () => {
                         <div>
                           <p className="font-medium">Question {index + 1}: {q.question}</p>
                           <p className="text-sm mt-1">
-                            <span className="font-medium">Your answer: </span> 
+                            <span className="font-medium">Your answer: </span>
                             <span className={!isCorrect ? 'text-red-600' : ''}>{userAnswers[index] || "No answer provided"}</span>
                           </p>
                           {!isCorrect && (
                             <p className="text-sm text-green-600 mt-1">
-                              <span className="font-medium">Correct answer: </span> 
+                              <span className="font-medium">Correct answer: </span>
                               {q.correctAnswer}
                             </p>
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="mt-2 ml-7">
                         <p className="text-sm font-medium">Explanation:</p>
                         <p className="text-sm text-muted-foreground">
@@ -427,7 +428,7 @@ const Quiz = () => {
         );
       } else {
         const topicStrengths = getTopicStrengthAssessment();
-        
+
         return (
           <Card>
             <CardHeader>
@@ -448,8 +449,8 @@ const Quiz = () => {
                       <div className="flex justify-between items-center">
                         <span className="font-medium">{topic.topic}</span>
                         <span className={`text-sm px-2 py-0.5 rounded-full ${
-                          topic.strength === 'strong' 
-                            ? 'bg-green-100 text-green-800' 
+                          topic.strength === 'strong'
+                            ? 'bg-green-100 text-green-800'
                             : topic.strength === 'moderate'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
@@ -457,15 +458,15 @@ const Quiz = () => {
                           {topic.strength.charAt(0).toUpperCase() + topic.strength.slice(1)}
                         </span>
                       </div>
-                      <Progress 
+                      <Progress
                         value={
-                          topic.strength === 'strong' 
-                            ? 90 
+                          topic.strength === 'strong'
+                            ? 90
                             : topic.strength === 'moderate'
                             ? 50
                             : 20
-                        } 
-                        className="h-2" 
+                        }
+                        className="h-2"
                       />
                       <p className="text-sm text-muted-foreground">
                         <span className="font-medium">Recommendation:</span> {topic.recommendations}
@@ -474,12 +475,12 @@ const Quiz = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="space-y-6">
                 {shortAnswerQuestions.map((q, index) => (
                   <div key={index} className="p-4 border rounded-md">
                     <p className="font-medium mb-2">Question {index + 1}: {q.question}</p>
-                    
+
                     <div className="mt-3 space-y-3">
                       <div>
                         <p className="text-sm font-medium">Your Answer:</p>
@@ -487,7 +488,7 @@ const Quiz = () => {
                           {shortAnswerResponses[index] || "No answer provided"}
                         </p>
                       </div>
-                      
+
                       <div>
                         <p className="text-sm font-medium">Sample Answer:</p>
                         <p className="text-sm p-2 bg-green-50 rounded-md border border-green-100">
@@ -524,9 +525,10 @@ const Quiz = () => {
           </p>
         </div>
         <div className="flex items-center">
-          <p className="text-sm font-medium mr-3 hidden sm:block">
-            Currently studying: <span className="text-primary">{materialTitle}</span>
-          </p>
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+            {materialTitle}
+          </Badge>
           <Button variant="outline" size="sm" onClick={handleUploadNew}>
             <Upload className="h-4 w-4 mr-2" />
             New Material
@@ -539,11 +541,11 @@ const Quiz = () => {
           <TabsTrigger value="mcq">Multiple Choice</TabsTrigger>
           <TabsTrigger value="short-answer">Short Answer</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="mcq">
           {renderQuizContent()}
         </TabsContent>
-        
+
         <TabsContent value="short-answer">
           {renderQuizContent()}
         </TabsContent>
