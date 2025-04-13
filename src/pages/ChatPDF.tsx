@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Send, User } from "lucide-react";
+import { BookOpen, Send, User, Upload } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const ChatPDF = () => {
   const [messages, setMessages] = useState([
@@ -14,6 +16,8 @@ const ChatPDF = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [materialTitle, setMaterialTitle] = useState("Introduction to Neural Networks");
+  const navigate = useNavigate();
 
   // Sample PDF content summary
   const summary = {
@@ -54,13 +58,29 @@ const ChatPDF = () => {
     }, 1000);
   };
 
+  const handleUploadNew = () => {
+    navigate("/upload");
+  };
+
   return (
     <div className="container mx-auto max-w-6xl p-1 md:p-1 fade-in">
-      <div className="flex flex-col space-y-2 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Chat with PDF</h1>
-        <p className="text-muted-foreground">
-          Ask questions about your document and get instant answers
-        </p>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-2 md:space-y-0 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Chat with PDF</h1>
+          <p className="text-muted-foreground">
+            Ask questions about your document and get instant answers
+          </p>
+        </div>
+        <div className="flex items-center">
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+            {materialTitle}
+          </Badge>
+          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+            <Upload className="h-4 w-4 mr-2" />
+            New Material
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -69,7 +89,7 @@ const ChatPDF = () => {
             <CardHeader className="px-4 py-3 border-b">
               <CardTitle className="text-lg font-medium">Document Chat</CardTitle>
               <CardDescription>
-                Ask questions about "Introduction to Neural Networks.pdf"
+                Ask questions about "{materialTitle}.pdf"
               </CardDescription>
             </CardHeader>
             <ScrollArea className="flex-1 p-4">

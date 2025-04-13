@@ -38,10 +38,10 @@ export function AppLayout() {
         className={`${sidebarOpen ? 'block' : 'hidden'} md:block fixed z-40 md:relative w-64`} 
       />
       
-      {/* Main content */}
-      <div className="flex flex-col flex-1 md:ml-64">
+      {/* Main content - removed left margin for md screens and added it to the main element instead */}
+      <div className="flex flex-col flex-1">
         <Header />
-        <main className="flex-1 p-6 pt-16 md:pt-6">
+        <main className="flex-1 p-6 pt-16 md:pt-6 md:ml-64">
           <Outlet />
         </main>
       </div>
