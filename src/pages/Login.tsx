@@ -18,7 +18,7 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simulate login process
     setTimeout(() => {
       setIsLoading(false);
@@ -26,7 +26,7 @@ const Login = () => {
       if (email && password) {
         toast({
           title: "Logged in successfully",
-          description: "Welcome back to LearnAI!",
+          description: "Welcome back to Learnado!",
         });
         navigate("/dashboard");
       } else {
@@ -46,17 +46,17 @@ const Login = () => {
           <div className="flex justify-center mb-2">
             <FileText className="h-10 w-10" />
           </div>
-          <CardTitle className="text-2xl font-bold">LearnAI</CardTitle>
+          <CardTitle className="text-2xl font-bold">Learnado</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="student@example.com" 
+              <Input
+                id="email"
+                type="email"
+                placeholder="student@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -69,10 +69,10 @@ const Login = () => {
                   Forgot password?
                 </Button>
               </div>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="••••••••" 
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
