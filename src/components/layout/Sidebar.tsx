@@ -9,7 +9,7 @@ import {
   FileText,
   Home,
   LayoutDashboard,
-  MessageSquare, 
+  MessageSquare,
   SquareStack,
   Upload,
   User,
@@ -24,7 +24,7 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const location = useLocation();
-  
+
   const links = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/upload", label: "Upload", icon: Upload },
@@ -43,7 +43,7 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="px-4 py-2">
           <Link to="/" className="flex items-center gap-2">
             <FileText className="h-6 w-6" />
-            <h2 className="text-lg font-semibold tracking-tight">LearnAI</h2>
+            <h2 className="text-lg font-semibold tracking-tight">Learnado</h2>
           </Link>
         </div>
         <Separator />
