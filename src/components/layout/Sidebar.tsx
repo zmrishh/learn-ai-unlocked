@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -38,7 +37,7 @@ export function Sidebar({ className }: SidebarProps) {
   ];
 
   return (
-    <div className={cn("pb-12 min-h-screen border-r", className)}>
+    <div className={cn("bg-background border-r", className)}>
       <div className="space-y-4 py-4">
         <div className="px-4 py-2">
           <Link to="/" className="flex items-center gap-2">
@@ -47,7 +46,7 @@ export function Sidebar({ className }: SidebarProps) {
           </Link>
         </div>
         <Separator />
-        <ScrollArea className="px-1">
+        <ScrollArea className="h-[calc(100vh-8rem)]">
           <div className="space-y-1 p-2">
             {links.map((link) => (
               <Button
