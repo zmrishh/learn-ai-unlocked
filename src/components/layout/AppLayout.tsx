@@ -19,7 +19,10 @@ export function AppLayout() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden"
+        className={cn(
+          "fixed z-50 md:hidden",
+          sidebarOpen ? "top-4 right-4" : "top-4 left-4"
+        )}
         onClick={toggleSidebar}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

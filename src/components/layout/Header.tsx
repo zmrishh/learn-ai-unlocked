@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +7,7 @@ import { useState } from "react";
 export function Header() {
   const navigate = useNavigate();
   const [currentMaterial, setCurrentMaterial] = useState("Neural Networks");
-  
+
   const handleLogout = () => {
     // In a real app, this would clear the authentication state
     navigate("/login");
@@ -17,11 +16,11 @@ export function Header() {
   return (
     <header className="border-b sticky top-0 bg-background z-30">
       <div className="flex h-16 items-center px-4 sm:px-6">
-        {/* Material title shown on small screens */}
-        <div className="md:hidden text-sm font-medium truncate max-w-[150px]">
+        {/* Material title shown on small screens - moved to the right of the hamburger menu */}
+        <div className="md:hidden text-sm font-medium truncate max-w-[150px] ml-16">
           {currentMaterial}
         </div>
-        
+
         <div className="ml-auto flex items-center space-x-4">
           <div className="flex items-center gap-4">
             <Avatar>
