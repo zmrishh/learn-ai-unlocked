@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { FileUp, Link as LinkIcon, Loader2 } from "lucide-react";
+import { FileUp, Link as LinkIcon, Loader2, Youtube } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Upload = () => {
@@ -62,6 +62,14 @@ const Upload = () => {
       });
       navigate("/smart-notes");
     }, 1500);
+  };
+
+  // Helper function to detect URL type
+  const detectUrlType = (url: string): 'youtube' | 'website' => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      return 'youtube';
+    }
+    return 'website';
   };
 
   return (
@@ -157,25 +165,31 @@ const Upload = () => {
             <CardHeader>
               <CardTitle>Enter URL</CardTitle>
               <CardDescription>
-                Provide a link to a webpage or online document to analyze
+                Provide a link to a webpage, YouTube video, or online document to analyze
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleUrlSubmit}>
               <CardContent className="space-y-4">
                 <div className="grid w-full gap-2">
-                  <Label htmlFor="url">Website URL</Label>
+                  <Label htmlFor="url">URL</Label>
                   <div className="flex items-center space-x-2">
-                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                    {detectUrlType(url) === 'youtube' ? (
+                      <Youtube className="h-4 w-4 text-red-500" />
+                    ) : (
+                      <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                    )}
                     <Input
                       id="url"
                       type="url"
-                      placeholder="https://example.com/article"
+                      placeholder="https://youtube.com/watch?v=... or any website URL"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Enter the full URL including https://
+                    {detectUrlType(url) === 'youtube' 
+                      ? 'YouTube videos will be processed for learning content'
+                      : 'Enter the full URL including https://'}
                   </p>
                 </div>
               </CardContent>

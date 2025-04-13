@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -175,7 +174,7 @@ const Flashcards = () => {
         </CardContent>
       </Card>
 
-      <style jsx global>{`
+      <style jsx>{`
         .perspective-1000 {
           perspective: 1000px;
         }

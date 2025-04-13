@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Download, Printer, Share2, BookmarkPlus } from "lucide-react";
+import { Download, Printer, Share2, BookmarkPlus, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const SmartNotes = () => {
+  const navigate = useNavigate();
   // Mock data for smart notes
   const notes = {
     title: "Introduction to Neural Networks",
+    source: "Neural_Networks.pdf",
     summary: "Neural networks are computing systems inspired by the biological neural networks in animal brains. They are the foundation of many modern AI systems and can learn to perform tasks by analyzing examples.",
     keyPoints: [
       "Neural networks consist of artificial neurons organized in layers",
@@ -37,13 +40,28 @@ const SmartNotes = () => {
     ]
   };
 
+  const handleUploadNew = () => {
+    navigate("/upload");
+  };
+
   return (
     <div className="container mx-auto max-w-4xl fade-in">
-      <div className="flex flex-col space-y-2 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">{notes.title}</h1>
-        <p className="text-muted-foreground">
-          AI-generated notes to help you understand the material
-        </p>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">{notes.title}</h1>
+          <p className="text-muted-foreground">
+            AI-generated notes to help you understand the material
+          </p>
+        </div>
+        <div className="flex items-center">
+          <p className="text-sm font-medium mr-3 hidden sm:block">
+            Source: <span className="text-primary">{notes.source}</span>
+          </p>
+          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+            <Upload className="h-4 w-4 mr-2" />
+            New Material
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">

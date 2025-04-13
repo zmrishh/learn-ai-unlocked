@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,11 +5,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, CornerDownRight, ArrowRight, ChevronRight, Trophy, EyeIcon, PencilIcon } from "lucide-react";
+import { CheckCircle2, XCircle, CornerDownRight, ArrowRight, ChevronRight, Trophy, EyeIcon, PencilIcon, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
-// Define quiz modes: Preview, Quiz, Feedback
 type QuizMode = "preview" | "quiz" | "feedback";
+
+interface TopicStrength {
+  topic: string;
+  strength: "weak" | "moderate" | "strong";
+  recommendations: string;
+}
 
 const Quiz = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -21,8 +26,9 @@ const Quiz = () => {
   const [quizType, setQuizType] = useState("mcq");
   const [shortAnswerResponse, setShortAnswerResponse] = useState("");
   const [shortAnswerResponses, setShortAnswerResponses] = useState<string[]>([]);
+  const [materialTitle, setMaterialTitle] = useState("Neural Networks");
+  const { toast } = useToast();
 
-  // Mock quiz questions
   const mcqQuestions = [
     {
       question: "Which of the following is NOT a type of neural network?",
@@ -70,9 +76,43 @@ const Quiz = () => {
     }
   ];
 
+  const getTopicStrengthAssessment = (): TopicStrength[] => {
+    if (quizType === "mcq") {
+      return [
+        {
+          topic: "Neural Network Fundamentals",
+          strength: score >= 2 ? "strong" : score >= 1 ? "moderate" : "weak",
+          recommendations: "Review the basic structure and types of neural networks."
+        },
+        {
+          topic: "Activation Functions",
+          strength: userAnswers[1] === mcqQuestions[1].correctAnswer ? "strong" : "weak",
+          recommendations: "Focus on understanding the purpose and types of activation functions."
+        },
+        {
+          topic: "Training Algorithms",
+          strength: userAnswers[2] === mcqQuestions[2].correctAnswer ? "strong" : "weak",
+          recommendations: "Study backpropagation and gradient descent algorithms in detail."
+        }
+      ];
+    } else {
+      return [
+        {
+          topic: "Learning Paradigms",
+          strength: shortAnswerResponses[0]?.length > 100 ? "strong" : "moderate",
+          recommendations: "Compare and contrast supervised and unsupervised learning with examples."
+        },
+        {
+          topic: "Model Optimization",
+          strength: shortAnswerResponses[1]?.length > 100 ? "strong" : "weak",
+          recommendations: "Study regularization techniques and early stopping in detail."
+        }
+      ];
+    }
+  };
+
   const handleStartQuiz = () => {
     setQuizMode("quiz");
-    // Initialize user answers array for MCQ with nulls
     if (quizType === "mcq") {
       setUserAnswers(Array(mcqQuestions.length).fill(null));
     } else {
@@ -84,24 +124,20 @@ const Quiz = () => {
 
   const handleNextQuestion = () => {
     if (quizType === "mcq") {
-      // Store the current answer
       const newUserAnswers = [...userAnswers];
       newUserAnswers[currentQuestion] = selectedAnswer;
       setUserAnswers(newUserAnswers);
     } else {
-      // Store short answer response
       const newResponses = [...shortAnswerResponses];
       newResponses[currentQuestion] = shortAnswerResponse;
       setShortAnswerResponses(newResponses);
     }
     
-    // Move to next question or finish quiz
     if (currentQuestion < (quizType === "mcq" ? mcqQuestions.length - 1 : shortAnswerQuestions.length - 1)) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
       setShortAnswerResponse("");
     } else {
-      // Calculate score for MCQ quiz
       if (quizType === "mcq") {
         let totalScore = 0;
         for (let i = 0; i < mcqQuestions.length; i++) {
@@ -130,14 +166,19 @@ const Quiz = () => {
     resetQuiz();
   };
 
-  // Calculate progress percentage
+  const handleUploadNew = () => {
+    toast({
+      title: "Upload New Material",
+      description: "Redirecting to upload page...",
+    });
+    // In a real app, this would navigate to the upload page
+  };
+
   const progressPercentage = quizType === "mcq" 
     ? ((currentQuestion + 1) / mcqQuestions.length) * 100
     : ((currentQuestion + 1) / shortAnswerQuestions.length) * 100;
 
-  // Render the quiz based on the current mode
   const renderQuizContent = () => {
-    // Preview Mode - User can browse questions before starting the quiz
     if (quizMode === "preview") {
       return (
         <Card>
@@ -184,7 +225,6 @@ const Quiz = () => {
       );
     }
     
-    // Quiz Mode - User is actively taking the quiz
     if (quizMode === "quiz") {
       return (
         <Card>
@@ -270,9 +310,10 @@ const Quiz = () => {
       );
     }
     
-    // Feedback Mode - After completing the quiz
     if (quizMode === "feedback") {
       if (quizType === "mcq") {
+        const topicStrengths = getTopicStrengthAssessment();
+        
         return (
           <Card>
             <CardHeader>
@@ -296,6 +337,41 @@ const Quiz = () => {
                     ? "Good job! Keep studying to improve."
                     : "Keep practicing to improve your score."}
                 </p>
+              </div>
+              
+              <div className="mb-6 p-4 border rounded-md bg-secondary/20">
+                <h3 className="font-semibold text-lg mb-3">Topic Strength Assessment</h3>
+                <div className="space-y-4">
+                  {topicStrengths.map((topic, index) => (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{topic.topic}</span>
+                        <span className={`text-sm px-2 py-0.5 rounded-full ${
+                          topic.strength === 'strong' 
+                            ? 'bg-green-100 text-green-800' 
+                            : topic.strength === 'moderate'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {topic.strength.charAt(0).toUpperCase() + topic.strength.slice(1)}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={
+                          topic.strength === 'strong' 
+                            ? 90 
+                            : topic.strength === 'moderate'
+                            ? 50
+                            : 20
+                        } 
+                        className="h-2" 
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium">Recommendation:</span> {topic.recommendations}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div className="space-y-6">
@@ -339,14 +415,20 @@ const Quiz = () => {
                 })}
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={resetQuiz} className="w-full">
+            <CardFooter className="flex gap-3 flex-wrap">
+              <Button onClick={resetQuiz} className="flex-1">
                 Try Again
+              </Button>
+              <Button variant="outline" onClick={handleUploadNew} className="flex-1">
+                <Upload className="h-4 w-4 mr-2" />
+                New Material
               </Button>
             </CardFooter>
           </Card>
         );
       } else {
+        const topicStrengths = getTopicStrengthAssessment();
+        
         return (
           <Card>
             <CardHeader>
@@ -359,6 +441,41 @@ const Quiz = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-6 p-4 border rounded-md bg-secondary/20">
+                <h3 className="font-semibold text-lg mb-3">Topic Strength Assessment</h3>
+                <div className="space-y-4">
+                  {topicStrengths.map((topic, index) => (
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{topic.topic}</span>
+                        <span className={`text-sm px-2 py-0.5 rounded-full ${
+                          topic.strength === 'strong' 
+                            ? 'bg-green-100 text-green-800' 
+                            : topic.strength === 'moderate'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {topic.strength.charAt(0).toUpperCase() + topic.strength.slice(1)}
+                        </span>
+                      </div>
+                      <Progress 
+                        value={
+                          topic.strength === 'strong' 
+                            ? 90 
+                            : topic.strength === 'moderate'
+                            ? 50
+                            : 20
+                        } 
+                        className="h-2" 
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium">Recommendation:</span> {topic.recommendations}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
               <div className="space-y-6">
                 {shortAnswerQuestions.map((q, index) => (
                   <div key={index} className="p-4 border rounded-md">
@@ -383,9 +500,13 @@ const Quiz = () => {
                 ))}
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={resetQuiz} className="w-full">
+            <CardFooter className="flex gap-3 flex-wrap">
+              <Button onClick={resetQuiz} className="flex-1">
                 Try Again
+              </Button>
+              <Button variant="outline" onClick={handleUploadNew} className="flex-1">
+                <Upload className="h-4 w-4 mr-2" />
+                New Material
               </Button>
             </CardFooter>
           </Card>
@@ -396,11 +517,22 @@ const Quiz = () => {
 
   return (
     <div className="container mx-auto max-w-3xl fade-in">
-      <div className="flex flex-col space-y-2 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Quiz Me</h1>
-        <p className="text-muted-foreground">
-          Test your knowledge with personalized quizzes
-        </p>
+      <div className="flex justify-between items-center mb-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Quiz Me</h1>
+          <p className="text-muted-foreground">
+            Test your knowledge with personalized quizzes
+          </p>
+        </div>
+        <div className="flex items-center">
+          <p className="text-sm font-medium mr-3 hidden sm:block">
+            Currently studying: <span className="text-primary">{materialTitle}</span>
+          </p>
+          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+            <Upload className="h-4 w-4 mr-2" />
+            New Material
+          </Button>
+        </div>
       </div>
 
       <Tabs value={quizType} onValueChange={handleQuizTypeChange} className="space-y-4">

@@ -1,8 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronRight, Plus, Minus, DownloadCloud } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload, FileUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 // Node interface for mindmap
 interface MindMapNode {
@@ -10,9 +11,15 @@ interface MindMapNode {
   label: string;
   children: MindMapNode[];
   expanded?: boolean;
+  type?: 'main' | 'primary' | 'secondary' | 'tertiary';
 }
 
 const Mindmap = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const materialTitle = "Neural Networks";
+  const materialSource = "Neural_Networks.pdf";
+  
   // Sample mindmap data
   const initialMindMap: MindMapNode = {
     id: "root",
@@ -136,6 +143,7 @@ const Mindmap = () => {
 
   const [mindMap, setMindMap] = useState<MindMapNode>(initialMindMap);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [viewMode, setViewMode] = useState<'mindmap' | 'flowchart'>('mindmap');
 
   // Function to toggle node expansion
   const toggleNode = (nodeId: string, nodes: MindMapNode = mindMap): MindMapNode => {
@@ -158,8 +166,12 @@ const Mindmap = () => {
     setMindMap(toggleNode(nodeId));
   };
 
-  // Recursive function to render nodes
-  const renderNode = (node: MindMapNode, level: number = 0) => {
+  const handleUploadNew = () => {
+    navigate("/upload");
+  };
+
+  // Recursive function to render nodes in mindmap style
+  const renderMindmapNode = (node: MindMapNode, level: number = 0) => {
     const hasChildren = node.children && node.children.length > 0;
     const isExpanded = node.expanded !== false;
     
@@ -184,7 +196,59 @@ const Mindmap = () => {
         
         {isExpanded && hasChildren && (
           <div className="pl-4">
-            {node.children.map((child) => renderNode(child, level + 1))}
+            {node.children.map((child) => renderMindmapNode(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+  
+  // Recursive function to render nodes in flowchart style
+  const renderFlowchartNode = (node: MindMapNode, level: number = 0) => {
+    const hasChildren = node.children && node.children.length > 0;
+    const isExpanded = node.expanded !== false;
+    
+    // Determine node style based on level
+    let nodeStyle = "";
+    let connectStyle = "";
+    
+    switch (level) {
+      case 0:
+        nodeStyle = "bg-primary text-primary-foreground";
+        connectStyle = "border-primary";
+        break;
+      case 1:
+        nodeStyle = "bg-blue-500 text-white";
+        connectStyle = "border-blue-500";
+        break;
+      case 2:
+        nodeStyle = "bg-green-500 text-white";
+        connectStyle = "border-green-500";
+        break;
+      default:
+        nodeStyle = "bg-yellow-500 text-white";
+        connectStyle = "border-yellow-500";
+    }
+    
+    return (
+      <div key={node.id} className="relative">
+        <div className="flex mb-4">
+          <div 
+            className={`px-4 py-2 rounded-md ${nodeStyle} cursor-pointer`}
+            onClick={() => handleNodeClick(node.id)}
+          >
+            {node.label}
+          </div>
+        </div>
+        
+        {isExpanded && hasChildren && (
+          <div className="ml-8 pl-4 border-l-2 border-dashed">
+            {node.children.map((child) => (
+              <div key={child.id} className="relative">
+                <div className={`absolute -left-4 top-3 w-4 border-t-2 border-dashed ${connectStyle}`}></div>
+                {renderFlowchartNode(child, level + 1)}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -193,11 +257,22 @@ const Mindmap = () => {
 
   return (
     <div className="container mx-auto max-w-5xl px-4 fade-in">
-      <div className="flex flex-col space-y-2 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Mind Map</h1>
-        <p className="text-muted-foreground">
-          Visualize concepts and their relationships
-        </p>
+      <div className="flex justify-between items-center mb-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Mind Map</h1>
+          <p className="text-muted-foreground">
+            Visualize concepts and their relationships
+          </p>
+        </div>
+        <div className="flex items-center">
+          <p className="text-sm font-medium mr-3 hidden sm:block">
+            Currently studying: <span className="text-primary">{materialTitle}</span>
+          </p>
+          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+            <Upload className="h-4 w-4 mr-2" />
+            New Material
+          </Button>
+        </div>
       </div>
       
       <div className="flex flex-col lg:flex-row gap-4">
@@ -207,6 +282,25 @@ const Mindmap = () => {
               <CardTitle className="text-lg">Controls</CardTitle>
             </CardHeader>
             <CardContent className="py-2 space-y-4">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={viewMode === 'mindmap' ? 'bg-secondary' : ''}
+                  onClick={() => setViewMode('mindmap')}
+                >
+                  Mind Map
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={viewMode === 'flowchart' ? 'bg-secondary' : ''}
+                  onClick={() => setViewMode('flowchart')}
+                >
+                  Flowchart
+                </Button>
+              </div>
+            
               <div className="flex items-center">
                 <Button
                   variant="outline"
@@ -265,14 +359,17 @@ const Mindmap = () => {
           <Card className="h-[calc(100vh-200px)] overflow-auto">
             <CardHeader className="py-4 px-6 border-b">
               <CardTitle>Neural Networks Mind Map</CardTitle>
-              <CardDescription>Explore the concepts and relationships</CardDescription>
+              <CardDescription>Exploring concepts from {materialSource}</CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               <div
                 className="mindmap-container"
                 style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top left' }}
               >
-                {renderNode(mindMap)}
+                {viewMode === 'mindmap' 
+                  ? renderMindmapNode(mindMap)
+                  : renderFlowchartNode(mindMap)
+                }
               </div>
             </CardContent>
           </Card>
