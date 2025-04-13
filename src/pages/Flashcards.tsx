@@ -1,14 +1,18 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, RotateCcw, Shuffle } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Shuffle, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const Flashcards = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [knownCards, setKnownCards] = useState<number[]>([]);
+  const [materialTitle, setMaterialTitle] = useState("Neural Networks");
+  const navigate = useNavigate();
   
   // Sample flashcards
   const flashcards = [
@@ -70,15 +74,30 @@ const Flashcards = () => {
     setIsFlipped(false);
   };
 
+  const handleUploadNew = () => {
+    navigate("/upload");
+  };
+
   const progressPercentage = (knownCards.length / flashcards.length) * 100;
 
   return (
     <div className="container mx-auto max-w-3xl fade-in">
-      <div className="flex flex-col space-y-2 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Flashcards</h1>
-        <p className="text-muted-foreground">
-          Review key concepts with these interactive flashcards
-        </p>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Flashcards</h1>
+          <p className="text-muted-foreground">
+            Review key concepts with these interactive flashcards
+          </p>
+        </div>
+        <div className="flex items-center">
+          <p className="text-sm font-medium mr-3 hidden sm:block">
+            Currently studying: <span className="text-primary">{materialTitle}</span>
+          </p>
+          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+            <Upload className="h-4 w-4 mr-2" />
+            New Material
+          </Button>
+        </div>
       </div>
 
       <div className="mb-6 space-y-2">
@@ -174,7 +193,8 @@ const Flashcards = () => {
         </CardContent>
       </Card>
 
-      <style jsx>{`
+      <style>
+        {`
         .perspective-1000 {
           perspective: 1000px;
         }
@@ -187,7 +207,8 @@ const Flashcards = () => {
         .rotate-y-180 {
           transform: rotateY(180deg);
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload, FileUp } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -227,7 +228,6 @@ const Mindmap = () => {
         break;
       default:
         nodeStyle = "bg-yellow-500 text-white";
-        connectStyle = "border-yellow-500";
     }
     
     return (

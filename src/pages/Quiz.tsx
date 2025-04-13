@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, CornerDownRight, ArrowRight, ChevronRight, Trophy, EyeIcon, PencilIcon, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 type QuizMode = "preview" | "quiz" | "feedback";
 
@@ -28,6 +30,7 @@ const Quiz = () => {
   const [shortAnswerResponses, setShortAnswerResponses] = useState<string[]>([]);
   const [materialTitle, setMaterialTitle] = useState("Neural Networks");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const mcqQuestions = [
     {
@@ -167,11 +170,7 @@ const Quiz = () => {
   };
 
   const handleUploadNew = () => {
-    toast({
-      title: "Upload New Material",
-      description: "Redirecting to upload page...",
-    });
-    // In a real app, this would navigate to the upload page
+    navigate("/upload");
   };
 
   const progressPercentage = quizType === "mcq" 
