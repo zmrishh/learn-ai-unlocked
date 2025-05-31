@@ -5,7 +5,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Download, Printer, Share2, BookmarkPlus,BookOpen, ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
+import {
+  Download, Printer, Share2, BookmarkPlus, BookOpen,
+  ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload, MoreHorizontal
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 
 const SmartNotes = () => {
@@ -58,37 +67,46 @@ const SmartNotes = () => {
           </p>
         </div>
         <div className="flex items-center">
-          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
+          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-secondary border-border text-secondary-foreground hidden sm:flex">
             <BookOpen className="h-3.5 w-3.5 mr-1.5" />
             {materialTitle}
           </Badge>
-          <Button variant="outline" size="sm" onClick={handleUploadNew}>
+          <Button variant="outline" size="sm" onClick={handleUploadNew} className="mr-2">
             <Upload className="h-4 w-4 mr-2" />
             New Material
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="h-9 w-9"> {/* Adjusted size to match other sm buttons */}
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">More actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => console.log("Download action")}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => console.log("Print action")}>
+                <Printer className="mr-2 h-4 w-4" />
+                Print
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => console.log("Share action")}>
+                <Share2 className="mr-2 h-4 w-4" />
+                Share
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => console.log("Save action")}>
+                <BookmarkPlus className="mr-2 h-4 w-4" />
+                Save
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        <Button variant="outline" size="sm">
-          <Download className="mr-2 h-4 w-4" />
-          Download
-        </Button>
-        <Button variant="outline" size="sm">
-          <Printer className="mr-2 h-4 w-4" />
-          Print
-        </Button>
-        <Button variant="outline" size="sm">
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
-        </Button>
-        <Button variant="outline" size="sm">
-          <BookmarkPlus className="mr-2 h-4 w-4" />
-          Save
-        </Button>
-      </div>
+      {/* Removed the old button group div */}
 
-      <Tabs defaultValue="notes" className="space-y-4">
+      <Tabs defaultValue="notes" className="space-y-4 mt-6"> {/* Added mt-6 to compensate for removed button group */}
         <TabsList>
           <TabsTrigger value="notes">Smart Notes</TabsTrigger>
           <TabsTrigger value="key-points">Key Points</TabsTrigger>

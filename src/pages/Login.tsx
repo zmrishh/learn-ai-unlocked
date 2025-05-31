@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText } from "lucide-react";
+import { mockLogin } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,24 +20,25 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // In a real app, you would validate credentials here
-      if (email && password) {
+    mockLogin(email, password)
+      .then((token) => {
+        localStorage.setItem("token", token);
         toast({
           title: "Logged in successfully",
           description: "Welcome back to Learnado!",
         });
         navigate("/dashboard");
-      } else {
+      })
+      .catch((error) => {
         toast({
           variant: "destructive",
           title: "Login failed",
-          description: "Please check your credentials and try again.",
+          description: error || "An unexpected error occurred.",
         });
-      }
-    }, 1000);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
