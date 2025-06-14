@@ -1,5 +1,5 @@
 import { useNotebook } from "@/context/NotebookContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,25 +28,23 @@ export default function Notebooks() {
   const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
 
+  // If a notebook now exists (immediately after creation), redirect to dashboard
+  // For improved reactivity, use effect
+  useEffect(() => {
+    if (!creating && notebooks && notebooks.length > 0) {
+      navigate("/dashboard", { replace: true });
+    }
+    // Do NOT include navigate in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notebooks, creating]);
+
   const handleCreate = async () => {
     if (!newNotebook.trim()) return;
     setCreating(true);
     await addNotebook(newNotebook.trim());
     setNewNotebook("");
-    // After adding, fetch notebooks again to get the ID of the new notebook
-    await refresh();
-    const latest = notebooks.length > 0
-      ? [...notebooks, { name: newNotebook.trim() }]
-      : [{ name: newNotebook.trim() }];
-    // Grab the latest notebook (should be first after fetch, due to order)
-    const updatedNotebooks = await refresh();
-    const notebooksList = Array.isArray(updatedNotebooks) ? updatedNotebooks : notebooks;
-    const newest = notebooksList[0] || notebooks[0];
-    if (newest) {
-      setNotebook(newest);
-      navigate("/dashboard", { replace: true });
-    }
     setCreating(false);
+    // We let the effect above handle redirect as soon as notebooks appear
   };
 
   if (loading) {

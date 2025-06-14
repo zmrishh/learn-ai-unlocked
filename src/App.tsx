@@ -24,15 +24,12 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { notebook, notebooks } = useNotebook();
-  const { user, loading } = useAuth();
+  const { notebook, notebooks, loading: notebooksLoading } = useNotebook();
+  const { user, loading: authLoading } = useAuth();
   const path = window.location.pathname;
-  const isAuthPage = path === "/auth";
-  const isNotebookPage = path === "/notebooks";
-  const navigate = useNavigate();
 
-  // Wait until the initial auth loading is done
-  if (loading) {
+  // Show loading spinner if still loading
+  if (authLoading || notebooksLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <span className="text-lg font-semibold text-muted-foreground">Loading...</span>
@@ -40,33 +37,60 @@ function AppContent() {
     );
   }
 
-  // Always redirect to /auth if not logged in
+  // Not authenticated: always show /auth
   if (!user) {
-    if (!isAuthPage) {
-      window.location.replace("/auth");
+    // Only show Auth page
+    if (path !== "/auth") {
+      return <Navigate to="/auth" replace />;
     }
-    return null;
+    return (
+      <>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="*" element={<Navigate to="/auth" replace />} />
+        </Routes>
+      </>
+    );
   }
 
-  // If logged in and on /auth, redirect to proper page
-  if (user && isAuthPage) {
-    // If they have no notebooks, show create/select page
-    if (!notebooks || notebooks.length === 0) {
-      window.location.replace("/notebooks");
-    } else {
-      // Otherwise, go straight to dashboard
-      window.location.replace("/dashboard");
+  // Authenticated but has no notebooks, stay on /notebooks
+  if (user && (!notebooks || notebooks.length === 0)) {
+    if (path !== "/notebooks") {
+      return <Navigate to="/notebooks" replace />;
     }
-    return null;
+    return (
+      <>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route path="/notebooks" element={<Notebooks />} />
+          <Route path="*" element={<Navigate to="/notebooks" replace />} />
+        </Routes>
+      </>
+    );
   }
 
-  // If logged in and has no notebooks, force to /notebooks (unless already there)
-  if (user && (!notebooks || notebooks.length === 0) && !isNotebookPage) {
-    window.location.replace("/notebooks");
-    return null;
+  // Authenticated with notebooks: go to dashboard unless already there
+  if (user && notebooks && notebooks.length > 0) {
+    if (
+      path !== "/dashboard" &&
+      path !== "/upload" &&
+      path !== "/smart-notes" &&
+      path !== "/chat-pdf" &&
+      path !== "/quiz" &&
+      path !== "/flashcards" &&
+      path !== "/mindmap" &&
+      path !== "/history" &&
+      path !== "/profile"
+    ) {
+      // Everything else (including /auth or /notebooks) will go to dashboard
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
-  // For all other normal routes
+  // For all normal, valid app routes
   return (
     <>
       <Toaster />
