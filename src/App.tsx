@@ -18,28 +18,36 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import React from "react";
 import Notebooks from "./pages/Notebooks";
+import Auth from "./pages/Auth";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const { notebook } = useNotebook();
+  const { user } = useAuth();
   const path = window.location.pathname;
-  const isLogin = path === "/login" || path === "/notebooks";
+  const isAuthPage = path === "/auth" || path === "/notebooks";
 
-  // If user isn't logged in or hasn't picked a notebook, send to notebooks page
-  if (!notebook && !isLogin) {
-    window.location.replace("/notebooks");
+  // Only allow access if user is logged in or on certain pages
+  if (!user && !isAuthPage) {
+    window.location.replace("/auth");
     return null;
   }
+  if (user && path === "/auth") {
+    window.location.replace("/dashboard");
+    return null;
+  }
+
   return (
     <>
       <Toaster />
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/notebooks" element={<Notebooks />} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/auth" replace />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/upload" element={<Upload />} />
@@ -62,7 +70,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <NotebookProvider>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </NotebookProvider>
     </TooltipProvider>
   </QueryClientProvider>
