@@ -26,16 +26,28 @@ function MaterialBadge({ material }: { material: any }) {
 export default function Notebooks() {
   const { notebooks, setNotebook, addNotebook, loading, refresh } = useNotebook();
   const [newNotebook, setNewNotebook] = useState("");
+  const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
 
   const handleCreate = async () => {
     if (!newNotebook.trim()) return;
+    setCreating(true);
     await addNotebook(newNotebook.trim());
     setNewNotebook("");
-    setTimeout(() => {
-      refresh(); // Refresh notebook list
-      navigate("/dashboard");
-    }, 250);
+    // After adding, fetch notebooks again to get the ID of the new notebook
+    await refresh();
+    const latest = notebooks.length > 0
+      ? [...notebooks, { name: newNotebook.trim() }]
+      : [{ name: newNotebook.trim() }];
+    // Grab the latest notebook (should be first after fetch, due to order)
+    const updatedNotebooks = await refresh();
+    const notebooksList = Array.isArray(updatedNotebooks) ? updatedNotebooks : notebooks;
+    const newest = notebooksList[0] || notebooks[0];
+    if (newest) {
+      setNotebook(newest);
+      navigate("/dashboard", { replace: true });
+    }
+    setCreating(false);
   };
 
   if (loading) {
@@ -63,7 +75,7 @@ export default function Notebooks() {
             if (e.key === "Enter") handleCreate();
           }}
         />
-        <Button onClick={handleCreate} disabled={!newNotebook.trim()}>
+        <Button onClick={handleCreate} disabled={!newNotebook.trim() || creating} loading={creating}>
           Create Notebook
         </Button>
       </div>

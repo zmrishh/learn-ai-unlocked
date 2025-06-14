@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,7 +24,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { notebook } = useNotebook();
+  const { notebook, notebooks } = useNotebook();
   const { user, loading } = useAuth();
   const path = window.location.pathname;
   const isAuthPage = path === "/auth";
@@ -49,18 +48,25 @@ function AppContent() {
     return null;
   }
 
-  // If logged in and on /auth, redirect to notebooks so they can create/select a notebook
+  // If logged in and on /auth, redirect to proper page
   if (user && isAuthPage) {
+    // If they have no notebooks, show create/select page
+    if (!notebooks || notebooks.length === 0) {
+      window.location.replace("/notebooks");
+    } else {
+      // Otherwise, go straight to dashboard
+      window.location.replace("/dashboard");
+    }
+    return null;
+  }
+
+  // If logged in and has no notebooks, force to /notebooks (unless already there)
+  if (user && (!notebooks || notebooks.length === 0) && !isNotebookPage) {
     window.location.replace("/notebooks");
     return null;
   }
 
-  // After login, if user has no notebooks, force them to notebooks page to create/select
-  if (user && !isNotebookPage && !notebook) {
-    window.location.replace("/notebooks");
-    return null;
-  }
-
+  // For all other normal routes
   return (
     <>
       <Toaster />
