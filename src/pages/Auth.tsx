@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Loader2, LogIn, UserPlus, Google } from "lucide-react";
+import { Loader2, LogIn, UserPlus, Globe } from "lucide-react";
 
 const Auth: React.FC = () => {
   const { toast } = useToast();
@@ -152,7 +151,7 @@ const Auth: React.FC = () => {
               onClick={handleGoogle}
               disabled={loading}
             >
-              <Google className="w-4 h-4" />
+              <Globe className="w-4 h-4" />
               Continue with Google
             </Button>
           </CardContent>
