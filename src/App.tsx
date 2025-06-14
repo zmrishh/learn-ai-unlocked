@@ -25,9 +25,18 @@ const queryClient = new QueryClient();
 
 function AppContent() {
   const { notebook } = useNotebook();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const path = window.location.pathname;
   const isAuthPage = path === "/auth" || path === "/notebooks";
+
+  // Wait until the initial auth loading is done
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="text-lg font-semibold text-muted-foreground">Loading...</span>
+      </div>
+    );
+  }
 
   // Only allow access if user is logged in or on certain pages
   if (!user && !isAuthPage) {
