@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -23,15 +22,15 @@ export function Header() {
       <div className="flex h-16 items-center px-4 sm:px-6">
         <div className="flex items-center space-x-2">
           {notebook && (
-            <>
-              <Badge variant="secondary" className="text-xs px-2 py-1 rounded">
-                Notebook: {notebook.name}
-              </Badge>
-              <Button variant="ghost" size="icon" onClick={() => setSelectorOpen(true)} className="ml-1" title="Switch Notebook">
-                <SwitchCamera className="h-5 w-5" />
-              </Button>
-              <NotebookSelector open={selectorOpen} />
-            </>
+            <Badge
+              variant="secondary"
+              className="flex gap-1 items-center text-xs px-2 py-1 rounded cursor-pointer"
+              onClick={() => navigate("/notebooks")}
+              title="Switch Notebook"
+            >
+              <Notebook className="w-4 h-4 mr-1" />
+              {notebook.name}
+            </Badge>
           )}
         </div>
         <div className="md:hidden text-sm font-medium truncate max-w-[150px] ml-16">{currentMaterial}</div>

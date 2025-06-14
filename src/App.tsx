@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { NotebookProvider, useNotebook } from "./context/NotebookContext";
-import { NotebookSelector } from "./components/NotebookSelector";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
@@ -19,22 +17,28 @@ import History from "./pages/History";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import React from "react";
+import Notebooks from "./pages/Notebooks";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const { notebook } = useNotebook();
   const path = window.location.pathname;
-  const isLogin = path === "/login";
+  const isLogin = path === "/login" || path === "/notebooks";
+
+  // If user isn't logged in or hasn't picked a notebook, send to notebooks page
+  if (!notebook && !isLogin) {
+    window.location.replace("/notebooks");
+    return null;
+  }
   return (
     <>
       <Toaster />
       <Sonner />
-      {/* Notebook selection dialog, except on login */}
-      {!notebook && !isLogin && <NotebookSelector open={!notebook} />}
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/notebooks" element={<Notebooks />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
