@@ -1,8 +1,9 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { NotebookProvider, useNotebook } from "./context/NotebookContext";
 import Login from "./pages/Login";
@@ -24,11 +25,11 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { notebook, notebooks, loading: notebooksLoading } = useNotebook();
+  const { notebooks, loading: notebooksLoading } = useNotebook();
   const { user, loading: authLoading } = useAuth();
-  const path = window.location.pathname;
+  const location = useLocation();
+  const path = location.pathname;
 
-  // Show loading spinner if still loading
   if (authLoading || notebooksLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -37,9 +38,8 @@ function AppContent() {
     );
   }
 
-  // Not authenticated: always show /auth
+  // 1. Handle UNAUTHENTICATED: Only allow /auth, redirect all else to /auth
   if (!user) {
-    // Only show Auth page
     if (path !== "/auth") {
       return <Navigate to="/auth" replace />;
     }
@@ -55,7 +55,7 @@ function AppContent() {
     );
   }
 
-  // Authenticated but has no notebooks, stay on /notebooks
+  // 2. Handle LOGGED IN WITH NO NOTEBOOK: Only allow /notebooks, redirect all else to /notebooks
   if (user && (!notebooks || notebooks.length === 0)) {
     if (path !== "/notebooks") {
       return <Navigate to="/notebooks" replace />;
@@ -72,33 +72,29 @@ function AppContent() {
     );
   }
 
-  // Authenticated with notebooks: go to dashboard unless already there
-  if (user && notebooks && notebooks.length > 0) {
-    if (
-      path !== "/dashboard" &&
-      path !== "/upload" &&
-      path !== "/smart-notes" &&
-      path !== "/chat-pdf" &&
-      path !== "/quiz" &&
-      path !== "/flashcards" &&
-      path !== "/mindmap" &&
-      path !== "/history" &&
-      path !== "/profile"
-    ) {
-      // Everything else (including /auth or /notebooks) will go to dashboard
-      return <Navigate to="/dashboard" replace />;
-    }
+  // 3. LOGGED IN WITH NOTEBOOK(s): only allow valid app routes, otherwise redirect to /dashboard
+  const validRoutes = [
+    "/dashboard",
+    "/upload",
+    "/smart-notes",
+    "/chat-pdf",
+    "/quiz",
+    "/flashcards",
+    "/mindmap",
+    "/history",
+    "/profile"
+  ];
+  // If at /notebooks or /auth (after login with notebook), go to dashboard.
+  if (path === "/notebooks" || path === "/auth" || path === "/" || !validRoutes.includes(path)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
-  // For all normal, valid app routes
+  // 4. Normal valid routes (authenticated with notebook)
   return (
     <>
       <Toaster />
       <Sonner />
       <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/notebooks" element={<Notebooks />} />
-        <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<Upload />} />
