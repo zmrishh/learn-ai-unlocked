@@ -9,9 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { NotebookPen, NotebookTabs, Folder, NotepadText } from "lucide-react";
 
 function MaterialBadge({ material }: { material: any }) {
-  const Icon = material.type === "pdf"
-    ? Folder
-    : material.type === "link"
+  const Icon =
+    material.type === "pdf"
+      ? Folder
+      : material.type === "link"
       ? NotebookTabs
       : NotepadText;
   return (
@@ -23,18 +24,27 @@ function MaterialBadge({ material }: { material: any }) {
 }
 
 export default function Notebooks() {
-  const { notebooks, setNotebook, addNotebook } = useNotebook();
+  const { notebooks, setNotebook, addNotebook, loading, refresh } = useNotebook();
   const [newNotebook, setNewNotebook] = useState("");
   const navigate = useNavigate();
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!newNotebook.trim()) return;
-    addNotebook(newNotebook.trim());
+    await addNotebook(newNotebook.trim());
     setNewNotebook("");
     setTimeout(() => {
+      refresh(); // Refresh notebook list
       navigate("/dashboard");
     }, 250);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh]">
+        <span className="text-lg text-muted-foreground">Loading...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto pt-16 sm:pt-24 px-4 space-y-10">
@@ -42,19 +52,27 @@ export default function Notebooks() {
         <NotebookPen className="w-6 h-6" /> Notebooks
       </h1>
       <p className="text-muted-foreground mb-8">
-        Create a notebook to organize your learning. Each notebook contains your uploaded PDFs, useful links, and notes. 
+        Create a notebook to organize your learning. Each notebook contains your uploaded PDFs, useful links, and notes.
       </p>
       <div className="flex gap-2 items-center max-w-md">
         <Input
           value={newNotebook}
           onChange={(e) => setNewNotebook(e.target.value)}
           placeholder="Enter notebook name"
-          onKeyDown={e => { if (e.key === "Enter") handleCreate(); }}
+          onKeyDown={e => {
+            if (e.key === "Enter") handleCreate();
+          }}
         />
-        <Button onClick={handleCreate} disabled={!newNotebook.trim()}>Create Notebook</Button>
+        <Button onClick={handleCreate} disabled={!newNotebook.trim()}>
+          Create Notebook
+        </Button>
       </div>
       <div className="mt-12 space-y-6">
-        {notebooks.length === 0 && <p className="text-muted-foreground">No notebooks yet. Create your first notebook above!</p>}
+        {notebooks.length === 0 && (
+          <p className="text-muted-foreground">
+            No notebooks yet. Create your first notebook above!
+          </p>
+        )}
         {notebooks.map((nb) => (
           <Card key={nb.id} className="hover-scale transition border-2 border-transparent hover:border-primary">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -65,17 +83,26 @@ export default function Notebooks() {
                 </CardTitle>
                 <CardDescription>
                   Last accessed:{" "}
-                  <span className="text-xs text-gray-400">{new Date(nb.lastAccessed).toLocaleString()}</span>
+                  <span className="text-xs text-gray-400">
+                    {new Date(nb.lastAccessed).toLocaleString()}
+                  </span>
                 </CardDescription>
               </div>
-              <Button onClick={() => { setNotebook(nb); navigate("/dashboard"); }}>
+              <Button
+                onClick={() => {
+                  setNotebook(nb);
+                  navigate("/dashboard");
+                }}
+              >
                 Open
               </Button>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-3 mt-2">
-                {(nb.materials && nb.materials.length > 0) ? (
-                  nb.materials.map((mat: any) => <MaterialBadge key={mat.id} material={mat} />)
+                {nb.materials && nb.materials.length > 0 ? (
+                  nb.materials.map((mat: any) => (
+                    <MaterialBadge key={mat.id} material={mat} />
+                  ))
                 ) : (
                   <Badge variant="outline">No learning materials yet</Badge>
                 )}

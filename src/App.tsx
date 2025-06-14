@@ -1,8 +1,9 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import { NotebookProvider, useNotebook } from "./context/NotebookContext";
 import Login from "./pages/Login";
@@ -27,7 +28,9 @@ function AppContent() {
   const { notebook } = useNotebook();
   const { user, loading } = useAuth();
   const path = window.location.pathname;
-  const isAuthPage = path === "/auth" || path === "/notebooks";
+  const isAuthPage = path === "/auth";
+  const isNotebookPage = path === "/notebooks";
+  const navigate = useNavigate();
 
   // Wait until the initial auth loading is done
   if (loading) {
@@ -38,13 +41,22 @@ function AppContent() {
     );
   }
 
-  // Only allow access if user is logged in or on certain pages
-  if (!user && !isAuthPage) {
+  // Redirect to /auth if not logged in
+  if (!user && !isAuthPage && !isNotebookPage) {
     window.location.replace("/auth");
     return null;
   }
-  if (user && path === "/auth") {
-    window.location.replace("/dashboard");
+
+  // If logged in and on /auth, redirect to main flow
+  if (user && isAuthPage) {
+    window.location.replace("/notebooks");
+    return null;
+  }
+
+  // After login, if user has no notebooks, force them to notebooks page to create/select
+  // NOTE: This prevents Dashboard, Upload, etc, if no notebook exists.
+  if (user && !isNotebookPage && !notebook) {
+    window.location.replace("/notebooks");
     return null;
   }
 
@@ -52,25 +64,23 @@ function AppContent() {
     <>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/notebooks" element={<Notebooks />} />
-          <Route path="/" element={<Navigate to="/auth" replace />} />
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/upload" element={<Upload />} />
-            <Route path="/smart-notes" element={<SmartNotes />} />
-            <Route path="/chat-pdf" element={<ChatPDF />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/flashcards" element={<Flashcards />} />
-            <Route path="/mindmap" element={<Mindmap />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/notebooks" element={<Notebooks />} />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/smart-notes" element={<SmartNotes />} />
+          <Route path="/chat-pdf" element={<ChatPDF />} />
+          <Route path="/quiz" element={<Quiz />} />
+          <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/mindmap" element={<Mindmap />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
   );
 }
@@ -80,7 +90,9 @@ const App = () => (
     <TooltipProvider>
       <NotebookProvider>
         <AuthProvider>
-          <AppContent />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
         </AuthProvider>
       </NotebookProvider>
     </TooltipProvider>
