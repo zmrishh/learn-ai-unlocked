@@ -1,7 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { LogOut, SwitchCamera } from "lucide-react";
+import { LogOut, SwitchCamera, NotebookTabs } from "lucide-react";
 import { useState } from "react";
 import { useNotebook } from "@/context/NotebookContext";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,7 @@ export function Header() {
               onClick={() => navigate("/notebooks")}
               title="Switch Notebook"
             >
-              <Notebook className="w-4 h-4 mr-1" />
+              <NotebookTabs className="w-4 h-4 mr-1" />
               {notebook.name}
             </Badge>
           )}
@@ -53,3 +54,4 @@ export function Header() {
     </header>
   );
 }
+
