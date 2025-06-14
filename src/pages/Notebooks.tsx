@@ -1,4 +1,3 @@
-
 import { useNotebook } from "@/context/NotebookContext";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -75,8 +74,11 @@ export default function Notebooks() {
             if (e.key === "Enter") handleCreate();
           }}
         />
-        <Button onClick={handleCreate} disabled={!newNotebook.trim() || creating} loading={creating}>
-          Create Notebook
+        <Button 
+          onClick={handleCreate} 
+          disabled={!newNotebook.trim() || creating}
+        >
+          {creating ? "Creating..." : "Create Notebook"}
         </Button>
       </div>
       <div className="mt-12 space-y-6">
