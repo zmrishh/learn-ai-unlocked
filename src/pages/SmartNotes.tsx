@@ -1,14 +1,15 @@
-
+import { useNotebook } from "@/context/NotebookContext";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
-import { Download, Printer, Share2, BookmarkPlus,BookOpen, ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
+import { Download, Printer, Share2, BookmarkPlus, BookOpen, ChevronDown, ChevronRight, Plus, Minus, DownloadCloud, Upload } from "lucide-react";
 import { useState } from "react";
 
 const SmartNotes = () => {
+  const { notebook } = useNotebook();
   const navigate = useNavigate();
   const [materialTitle, setMaterialTitle] = useState("Neural Networks");
 
@@ -49,24 +50,19 @@ const SmartNotes = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-4xl fade-in">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{notes.title}</h1>
+    <div className="space-y-6 p-1 md:p-4 fade-in">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Smart Notes</h2>
           <p className="text-muted-foreground">
-            AI-generated notes to help you understand the material
+            AI-assisted notes from your learning material
           </p>
         </div>
-        <div className="flex items-center">
-          <Badge variant="outline" className="mr-3 py-1.5 px-3 bg-purple-50 border-purple-200 text-purple-700 hidden sm:flex">
-            <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-            {materialTitle}
+        {notebook && (
+          <Badge variant="outline" className="text-xs font-bold px-2 py-1">
+            Notebook: {notebook.name}
           </Badge>
-          <Button variant="outline" size="sm" onClick={handleUploadNew}>
-            <Upload className="h-4 w-4 mr-2" />
-            New Material
-          </Button>
-        </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
