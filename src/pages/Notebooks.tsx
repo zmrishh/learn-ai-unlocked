@@ -1,3 +1,4 @@
+
 import { useNotebook } from "@/context/NotebookContext";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -23,18 +24,16 @@ function MaterialBadge({ material }: { material: any }) {
 }
 
 export default function Notebooks() {
-  const { notebooks, setNotebook, addNotebook, loading, refresh } = useNotebook();
+  const { notebooks, setNotebook, addNotebook, loading } = useNotebook();
   const [newNotebook, setNewNotebook] = useState("");
   const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
 
-  // If a notebook now exists (immediately after creation), redirect to dashboard
-  // For improved reactivity, use effect
   useEffect(() => {
-    if (!creating && notebooks && notebooks.length > 0) {
+    // If a notebook now exists (e.g. after creating), jump to dashboard.
+    if (notebooks && notebooks.length > 0 && !creating) {
       navigate("/dashboard", { replace: true });
     }
-    // Do NOT include navigate in deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notebooks, creating]);
 
@@ -44,7 +43,8 @@ export default function Notebooks() {
     await addNotebook(newNotebook.trim());
     setNewNotebook("");
     setCreating(false);
-    // We let the effect above handle redirect as soon as notebooks appear
+    // Immediately redirect after creation, for snappiness!
+    navigate("/dashboard", { replace: true });
   };
 
   if (loading) {
@@ -126,3 +126,4 @@ export default function Notebooks() {
     </div>
   );
 }
+
