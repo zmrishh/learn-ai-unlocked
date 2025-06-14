@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
@@ -73,13 +72,19 @@ export function NotebookProvider({ children }: { children: ReactNode }) {
         .eq("notebook_id", nb.id)
         .order("created_at", { ascending: true });
 
+      // Type guard: cast type to "pdf" | "link" | "note"
+      const typedMaterials = (materials || []).map((mat) => ({
+        ...mat,
+        type: mat.type as "pdf" | "link" | "note",
+      }));
+
       notebooksWithMaterials.push({
         id: nb.id,
         name: nb.name,
         lastAccessed: nb.last_accessed,
         createdAt: nb.created_at,
         updatedAt: nb.updated_at,
-        materials: mError ? [] : materials || [],
+        materials: mError ? [] : typedMaterials,
       });
     }
 

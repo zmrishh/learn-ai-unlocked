@@ -41,20 +41,21 @@ function AppContent() {
     );
   }
 
-  // Redirect to /auth if not logged in
-  if (!user && !isAuthPage && !isNotebookPage) {
-    window.location.replace("/auth");
+  // Always redirect to /auth if not logged in
+  if (!user) {
+    if (!isAuthPage) {
+      window.location.replace("/auth");
+    }
     return null;
   }
 
-  // If logged in and on /auth, redirect to main flow
+  // If logged in and on /auth, redirect to notebooks so they can create/select a notebook
   if (user && isAuthPage) {
     window.location.replace("/notebooks");
     return null;
   }
 
   // After login, if user has no notebooks, force them to notebooks page to create/select
-  // NOTE: This prevents Dashboard, Upload, etc, if no notebook exists.
   if (user && !isNotebookPage && !notebook) {
     window.location.replace("/notebooks");
     return null;
