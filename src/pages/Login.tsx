@@ -1,42 +1,34 @@
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate login process
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      toast({ title: 'Logged in successfully', description: 'Welcome back to Learnado!' });
+      navigate('/dashboard');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ variant: 'destructive', title: 'Login failed', description: message });
+    } finally {
       setIsLoading(false);
-      // In a real app, you would validate credentials here
-      if (email && password) {
-        toast({
-          title: "Logged in successfully",
-          description: "Welcome back to Learnado!",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: "Please check your credentials and try again.",
-        });
-      }
-    }, 1000);
+    }
   };
 
   return (
@@ -81,7 +73,7 @@ const Login = () => {
           </CardContent>
           <CardFooter>
             <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Log in"}
+              {isLoading ? 'Logging in...' : 'Log in'}
             </Button>
           </CardFooter>
         </form>
