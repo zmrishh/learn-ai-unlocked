@@ -82,4 +82,6 @@ Start it with:
 npm run start:server
 ```
 
-The frontend expects the API to be running on `http://localhost:3001`. You can modify `VITE_API_BASE` to change this.
+Ensure the server is running before starting the frontend. The app expects the
+API on `http://localhost:3001`, which can be changed with the `VITE_API_BASE`
+environment variable.

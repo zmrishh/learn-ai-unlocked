@@ -8,6 +8,10 @@ const PORT = 3001;
 const DB_FILE = './server/db.json';
 
 app.use(cors());
+app.use((_, res, next) => {
+  res.setHeader('Permissions-Policy', 'interest-cohort=()');
+  next();
+});
 app.use(express.json());
 
 let db = { users: [], notebooks: [], materials: [] };
@@ -42,6 +46,9 @@ app.post('/signup', (req, res) => {
   save();
   res.json({ token: user.token, user: { id: user.id, email: user.email } });
 });
+app.get('/signup', (_, res) => {
+  res.status(405).json({ error: 'Use POST to signup' });
+});
 
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -50,6 +57,9 @@ app.post('/login', (req, res) => {
   user.token = uuidv4();
   save();
   res.json({ token: user.token, user: { id: user.id, email: user.email } });
+});
+app.get('/login', (_, res) => {
+  res.status(405).json({ error: 'Use POST to login' });
 });
 
 app.get('/session', auth, (req, res) => {
@@ -84,6 +94,10 @@ app.post('/notebooks/:id/materials', auth, (req, res) => {
   db.materials.push(material);
   save();
   res.json(material);
+});
+
+app.get('/', (_, res) => {
+  res.json({ status: 'ok' });
 });
 
 app.listen(PORT, () => {
