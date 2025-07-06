@@ -23,8 +23,9 @@ const Login = () => {
       await login(email, password);
       toast({ title: 'Logged in successfully', description: 'Welcome back to Learnado!' });
       navigate('/dashboard');
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Login failed', description: err.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ variant: 'destructive', title: 'Login failed', description: message });
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,5 @@
 
-import { useNotebook } from "@/context/NotebookContext";
+import { useNotebook, type Material } from "@/context/NotebookContext";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/com
 import { useNavigate } from "react-router-dom";
 import { NotebookPen, NotebookTabs, Folder, NotepadText } from "lucide-react";
 
-function MaterialBadge({ material }: { material: any }) {
+function MaterialBadge({ material }: { material: Material }) {
   const Icon =
     material.type === "pdf"
       ? Folder
@@ -111,10 +111,10 @@ export default function Notebooks() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-3 mt-2">
-                {nb.materials && nb.materials.length > 0 ? (
-                  nb.materials.map((mat: any) => (
-                    <MaterialBadge key={mat.id} material={mat} />
-                  ))
+                  {nb.materials && nb.materials.length > 0 ? (
+                    nb.materials.map((mat: Material) => (
+                      <MaterialBadge key={mat.id} material={mat} />
+                    ))
                 ) : (
                   <Badge variant="outline">No learning materials yet</Badge>
                 )}

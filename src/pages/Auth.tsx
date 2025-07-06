@@ -27,8 +27,9 @@ const Auth: React.FC = () => {
       }
       toast({ title: 'Success', description: 'You are logged in.' });
       navigate('/dashboard');
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Auth failed', description: err.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast({ variant: 'destructive', title: 'Auth failed', description: message });
     } finally {
       setLoading(false);
     }

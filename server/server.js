@@ -12,8 +12,15 @@ app.use(express.json());
 
 let db = { users: [], notebooks: [], materials: [] };
 if (fs.existsSync(DB_FILE)) {
-  db = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+  try {
+    db = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+  } catch {
+    db = { users: [], notebooks: [], materials: [] };
+  }
 }
+db.users ||= [];
+db.notebooks ||= [];
+db.materials ||= [];
 function save() {
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
