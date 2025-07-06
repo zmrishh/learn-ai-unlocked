@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./AuthContext";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import * as api from '@/integrations/api/client';
 
 export type Material = {
   id: string;
-  type: "pdf" | "link" | "note";
+  type: 'pdf' | 'link' | 'note';
   name: string;
   url?: string;
   content?: string;
@@ -27,74 +27,49 @@ type NotebookContextType = {
   setNotebook: (notebook: Notebook | null) => void;
   refresh: () => void;
   addNotebook: (name: string) => Promise<void>;
-  addMaterial: (notebookId: string, material: Omit<Material, "id" | "created_at" | "updated_at">) => Promise<void>;
+  addMaterial: (notebookId: string, material: Omit<Material, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   loading: boolean;
 };
 
 const NotebookContext = createContext<NotebookContextType | undefined>(undefined);
 
 export function NotebookProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [notebook, setNotebookState] = useState<Notebook | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // fetch notebooks and materials for current user
   const fetchNotebooks = async () => {
     setLoading(true);
-    if (!user) {
+    if (!user || !token) {
       setNotebooks([]);
       setNotebookState(null);
       setLoading(false);
       return;
     }
-
-    // fetch notebooks
-    const { data: nbData, error: nbError } = await supabase
-      .from("notebooks")
-      .select("id, name, last_accessed, created_at, updated_at")
-      .eq("user_id", user.id)
-      .order("last_accessed", { ascending: false });
-
-    if (nbError) {
+    try {
+      const nbData = await api.listNotebooks(token);
+      const notebooksWithMaterials: Notebook[] = [];
+      for (const nb of nbData) {
+        const materials = await api.listMaterials(token, nb.id);
+        notebooksWithMaterials.push({
+          id: nb.id,
+          name: nb.name,
+          lastAccessed: nb.lastAccessed,
+          createdAt: nb.createdAt,
+          updatedAt: nb.updatedAt,
+          materials,
+        });
+      }
+      setNotebooks(notebooksWithMaterials);
+      if (notebook && notebooksWithMaterials.some(n => n.id === notebook.id)) {
+        setNotebookState(notebooksWithMaterials.find(n => n.id === notebook.id) || null);
+      } else {
+        setNotebookState(notebooksWithMaterials[0] || null);
+      }
+    } catch (e) {
       setNotebooks([]);
       setNotebookState(null);
-      setLoading(false);
-      return;
-    }
-
-    // For each notebook, fetch its materials
-    const notebooksWithMaterials: Notebook[] = [];
-    for (const nb of nbData || []) {
-      const { data: materials, error: mError } = await supabase
-        .from("materials")
-        .select("id, name, type, url, content, created_at, updated_at")
-        .eq("notebook_id", nb.id)
-        .order("created_at", { ascending: true });
-
-      // Type guard: cast type to "pdf" | "link" | "note"
-      const typedMaterials = (materials || []).map((mat) => ({
-        ...mat,
-        type: mat.type as "pdf" | "link" | "note",
-      }));
-
-      notebooksWithMaterials.push({
-        id: nb.id,
-        name: nb.name,
-        lastAccessed: nb.last_accessed,
-        createdAt: nb.created_at,
-        updatedAt: nb.updated_at,
-        materials: mError ? [] : typedMaterials,
-      });
-    }
-
-    setNotebooks(notebooksWithMaterials);
-
-    // If notebook context is empty or points to an old notebook, pick latest or null
-    if (notebook && notebooksWithMaterials.some(n => n.id === notebook.id)) {
-      setNotebookState(notebooksWithMaterials.find(n => n.id === notebook.id) || null);
-    } else {
-      setNotebookState(notebooksWithMaterials[0] || null);
     }
     setLoading(false);
   };
@@ -102,48 +77,32 @@ export function NotebookProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchNotebooks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, token]);
 
   const refresh = fetchNotebooks;
 
-  // create notebook for current user
   const addNotebook = async (name: string) => {
-    if (!user) return;
-    await supabase.from("notebooks").insert({
-      name,
-      user_id: user.id,
-    });
+    if (!token) return;
+    await api.createNotebook(token, name);
     await fetchNotebooks();
   };
 
-  // create a new material attached to notebookId
   const addMaterial = async (
     notebookId: string,
-    material: Omit<Material, "id" | "created_at" | "updated_at">
+    material: Omit<Material, 'id' | 'created_at' | 'updated_at'>
   ) => {
-    await supabase.from("materials").insert({
-      ...material,
-      notebook_id: notebookId,
-    });
+    if (!token) return;
+    await api.addMaterial(token, notebookId, material);
     await fetchNotebooks();
   };
 
-  // update notebook selection
   const setNotebook = (nb: Notebook | null) => {
     setNotebookState(nb);
   };
 
   return (
     <NotebookContext.Provider
-      value={{
-        notebooks,
-        notebook,
-        setNotebook,
-        addNotebook,
-        addMaterial,
-        loading,
-        refresh,
-      }}
+      value={{ notebooks, notebook, setNotebook, addNotebook, addMaterial, loading, refresh }}
     >
       {children}
     </NotebookContext.Provider>
@@ -152,6 +111,6 @@ export function NotebookProvider({ children }: { children: ReactNode }) {
 
 export function useNotebook() {
   const ctx = useContext(NotebookContext);
-  if (!ctx) throw new Error("useNotebook must be used within NotebookProvider");
+  if (!ctx) throw new Error('useNotebook must be used within NotebookProvider');
   return ctx;
 }

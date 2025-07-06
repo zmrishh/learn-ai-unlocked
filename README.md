@@ -71,3 +71,15 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Local Backend
+
+This project no longer depends on Supabase. A small Express backend is included in `server/`.
+
+Start it with:
+
+```bash
+npm run start:server
+```
+
+The frontend expects the API to be running on `http://localhost:3001`. You can modify `VITE_API_BASE` to change this.
